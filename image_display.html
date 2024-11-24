@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Repository Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        img {
+            max-width: 100px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fetch Repository Images</h1>
+    <form id="fetchImagesForm">
+        <label for="repoId">Repository ID:</label>
+        <input type="text" id="repoId" placeholder="Enter repository ID" required>
+        <button type="submit">Fetch Images</button>
+    </form>
+
+    <h2>Images</h2>
+    <div id="imagesContainer">
+        <!-- Images will be displayed here -->
+    </div>
+
+    <script>
+        let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczMjIyODg5NiwianRpIjoiZDY2OTg3NzUtNmE5Yi00MzkzLWJiOWItZGQ1OTgyY2M4MzEzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InVneWVuLmppZ21lMjAxOEBnbWFpbC5jb20iLCJuYmYiOjE3MzIyMjg4OTYsImNzcmYiOiIwYmEwNDJmOS1mNjQzLTQwNmYtODJlYy03NTE2OGQwNGUzNTIiLCJleHAiOjE3MzIyMjk3OTZ9.PdQOUZC0eUwq6_MKDA0-KfUj1Kqtz6iSTAuOJRnkA28'; // Replace with your JWT token after login
+
+        // Handle Fetch Images Form Submission
+        document.getElementById('fetchImagesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const repoId = document.getElementById('repoId').value;
+
+            if (!token) {
+                alert('Please log in to get a valid token.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/api/images/repo/image/${repoId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    displayImages(data.image_list);
+                } else {
+                    alert(`Error: ${data.msg}`);
+                }
+            } catch (error) {
+                console.error('Error fetching images:', error);
+                alert('An error occurred while fetching images.');
+            }
+        });
+
+        // Display Images in the UI
+        function displayImages(images) {
+            const container = document.getElementById('imagesContainer');
+            container.innerHTML = ''; // Clear previous images
+
+            if (images.length === 0) {
+                container.innerHTML = '<p>No images found for this repository.</p>';
+                return;
+            }
+
+            images.forEach(image => {
+                const img = document.createElement('img');
+                img.src = image.url; // Assuming `url` is part of the `img.to_json()` output
+                img.alt = image.immage_url || 'imag';
+                container.appendChild(img);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+.photo-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* Set exactly 5 photos per row */
+  gap: 0; /* Remove space between photos for a seamless look */
+}
+
+.photo-thumbnail-container {
+  position: relative; /* Use relative positioning for the container */
+}
+
+.photo-thumbnail {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Make each image a perfect square */
+  object-fit: cover; /* Ensure images cover the entire square without distortion */
+  cursor: pointer;
+  border: none; /* Remove any border to create a seamless look */
+}
+
+.photo-badge {
+  position: absolute; /* Position it absolutely relative to its container */
+  top: 500px; /* Adjust the position as needed */
+  left: 500px; /* Adjust the position as needed */
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+  color: #fff; /* White text */
+  padding: 5px 10px; /* Padding to make it look like a badge */
+  border-radius: 5px; /* Slightly rounded corners for the badge */
+  font-size: 14px; /* Font size for badge text */
+}
+
+.photo-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.photo-modal-content {
+  position: relative;
+  max-width: 80%;
+  max-height: 80%;
+}
+
+.photo-full {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background-color: #ddd;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+}

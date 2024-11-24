@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Image Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="loginForm">
+        <label for="email">Email:</label>
+        <input type="text" id="email" placeholder="Enter your email" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <h1>Upload Images</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="files" name="files" multiple required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h1>Repository List</h1>
+    <ul id="repository-list">
+
+    </ul>
+
+    <script>
+        let token = '';
+    
+        // Handle Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+    
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+    
+                const data = await response.json();
+                if (response.ok) {
+                    token = data.token; // Assuming your login API returns a JWT
+                    alert('Login successful!');
+                    fetchRepositories(); // Fetch repositories after login
+                } else {
+                    alert(`Login failed: ${data.msg}`);
+                }
+            } catch (error) {
+                console.error('Error logging in:', error);
+                alert('An error occurred during login.');
+            }
+        });
+    
+        // Handle Image Upload
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!token) {
+                alert('Please log in first.');
+                return;
+            }
+    
+            const files = document.getElementById('files').files;
+            if (!files.length) {
+                alert('Please select at least one file.');
+                return;
+            }
+    
+            const formData = new FormData();
+            for (const file of files) {
+                formData.append('file', file);
+            }
+    
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/images/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData,
+                });
+    
+                const data = await response.json();
+                if (response.ok) {
+                    alert(`Upload successful! Predictions: ${JSON.stringify(data.Predictions)}`);
+                } else {
+                    alert(`Upload failed: ${data.msg}`);
+                }
+            } catch (error) {
+                console.error('Error uploading files:', error);
+                alert('An error occurred during upload.');
+            }
+        });
+    
+        // Fetch Repository List
+        async function fetchRepositories() {
+            if (!token) {
+                alert('Please log in first.');
+                return;
+            }
+    
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/images/list_repo', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+    
+                const data = await response.json();
+                if (response.ok) {
+                    displayRepositories(data.repo);
+                } else {
+                    alert(`Failed to fetch repositories: ${data.msg}`);
+                }
+            } catch (error) {
+                console.error('Error fetching repositories:', error);
+                alert('An error occurred while fetching repositories.');
+            }
+        }
+    
+        // Display Repository List in the UI
+        function displayRepositories(repositories) {
+            const repoList = document.getElementById('repository-list');
+            repoList.innerHTML = ''; // Clear the list
+    
+            if (repositories.length === 0) {
+                repoList.innerHTML = '<li>No repositories found.</li>';
+                return;
+            }
+    
+            repositories.forEach(repo => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#">${repo.repo_name}</a>`;
+                repoList.appendChild(li);
+            });
+        }
+
+    </script>
+    
+</body>
+</html>

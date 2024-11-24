@@ -1,0 +1,55 @@
+# Byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment directories
+venv/
+env/
+.virtualenv/
+lib/
+lib64/
+bin/
+include/
+share/
+
+# Environment variables and sensitive configuration
+.env
+*.env
+
+# Flask-specific files
+instance/
+uploads/
+
+# Logs
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VSCode or IDE-specific files
+.vscode/
+.idea/
+
+# Compiled Python files and caches
+*.egg-info/
+.cache/
+
+# Temporary files
+uploads/*
+*.tmp
+*.swp
+*~
+
+# Frontend files if not needed for version control (e.g. node_modules if using JS framework)
+node_modules/
+frontend/build/
+
+# Ignore migrations if using a different strategy to track migrations
+migrations/
+
+# Ignore other backup files
+*.bak
+*.backup
