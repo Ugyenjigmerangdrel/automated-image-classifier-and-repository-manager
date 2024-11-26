@@ -30,7 +30,6 @@ const Repository = () => {
   console.log(repo);
   return (
     <div className="m-auto w-[80vw] p-5">
-      <h1 className="text-3xl mb-5">Albums</h1>
       <div className="border border-gray-300 rounded-lg">
         <div className="grid grid-cols-4 gap-4 p-3 border-b border-gray-200 font-semibold text-gray-700">
           <div className="col-span-2">Name</div>

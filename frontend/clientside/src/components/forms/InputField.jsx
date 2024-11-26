@@ -1,13 +1,13 @@
 const InputField = ({
   icon: Icon,
   placeholder,
-  type,
+  type = "text",
   value,
   onChange,
   nameValue,
 }) => (
-  <div className="flex items-center bg-gray-100 p-3 rounded-lg">
-    <Icon className="text-gray-500 mr-3" size={20} />
+  <div className="flex items-center bg-gray-100 p-3 rounded-lg shadow-sm hover:shadow-md transition">
+    {Icon && <Icon className="text-gray-500 mr-3" size={20} />}
     <input
       type={type}
       placeholder={placeholder}
