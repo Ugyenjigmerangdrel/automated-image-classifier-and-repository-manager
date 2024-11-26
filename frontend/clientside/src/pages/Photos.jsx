@@ -1,88 +1,171 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import React, { useEffect, useState } from "react";
+import Masonry from "react-masonry-css";
+import { useAuth } from "../context/AuthContext"; // Assuming authentication context
+import "./Photos.css";
 
 const API_HEAD = import.meta.env.VITE_API;
 
 const Photos = () => {
-  const { userToken } = useAuth();
+  const { userToken } = useAuth(); // Assuming Auth Context provides the token
   const [photos, setPhotos] = useState([]);
-  const [error, setError] = useState();
-  const [openPhoto, setOpenPhoto] = useState(null); // Track open photo
+  const [error, setError] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null); // Track context menu state
+
+  const breakpointColumnsObj = {
+    default: 4,
+    1100: 3,
+    700: 2,
+    500: 1,
+  };
 
   useEffect(() => {
-    async function fetchPhotos() {
+    const fetchPhotos = async () => {
       try {
         const response = await fetch(`${API_HEAD}/api/images/list`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
         });
+
         if (!response.ok) {
-          setError("Something Went Wrong!");
+          setError("Failed to load images.");
           return;
         }
 
         const data = await response.json();
-        setError(null);
         const formattedPhotos = data.image_list.map((photo, index) => ({
           key: `${photo.image.immage_url}_${index}`,
           src: photo.image.immage_url,
-          width: Number(photo.image.width),
-          height: Number(photo.image.height),
+          width: photo.image.width,
+          height: photo.image.height,
           repo_name: photo.repo_name,
         }));
+
         setPhotos(formattedPhotos);
-      } catch (error) {
-        setError(error.message);
+      } catch (err) {
+        setError("Error fetching images.");
       }
-    }
+    };
 
     fetchPhotos();
   }, [userToken]);
 
+  // Handlers for fullscreen view
+  const openImageViewer = (index) => {
+    setCurrentImageIndex(index);
+  };
+
+  const closeImageViewer = () => {
+    setCurrentImageIndex(null);
+  };
+
+  const showPreviousImage = () => {
+    if (currentImageIndex > 0) {
+      setCurrentImageIndex(currentImageIndex - 1);
+    }
+  };
+
+  const showNextImage = () => {
+    if (currentImageIndex < photos.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+    }
+  };
+
+  // Context menu handlers
+  const handleContextMenu = (event, index) => {
+    event.preventDefault();
+    setContextMenu({
+      x: event.pageX,
+      y: event.pageY,
+      index,
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  const handleMenuOptionClick = (option) => {
+    alert(
+      `Selected option: ${option} for image ${
+        photos[contextMenu.index].repo_name
+      }`
+    );
+    setContextMenu(null);
+  };
+
   return (
-    <div className="p-5 text-center w-[80vw] m-auto">
-      <h1 className="text-3xl font-semibold mb-6">Photos</h1>
-      {error && <p className="text-red-500 font-bold">{error}</p>}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {photos.map((photo, index) => (
-          <div key={photo.key} className="relative group cursor-pointer">
-            <img
-              src={photo.src}
-              alt={`Photo ${index + 1}`}
-              className="w-full h-full object-cover aspect-square rounded-md transition-transform duration-200 hover:scale-105"
-              onClick={() => setOpenPhoto(photo)}
-            />
-            <div className="absolute top-2 left-2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-md text-sm group-hover:bg-opacity-80">
-              {photo.repo_name}
+    <div className="App" onClick={closeContextMenu}>
+      <br />
+      {error && <p className="error">{error}</p>}
+      <div className="m-auto max-w-[80vw]">
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="my-masonry-grid"
+          columnClassName="my-masonry-grid_column"
+        >
+          {photos.map((photo, index) => (
+            <div
+              key={photo.key}
+              className="image-container"
+              onContextMenu={(event) => handleContextMenu(event, index)}
+            >
+              <img
+                src={photo.src}
+                alt={photo.repo_name}
+                className="image-item"
+              />
+              <div className="image-overlay">{photo.repo_name}</div>
             </div>
-          </div>
-        ))}
+          ))}
+        </Masonry>
       </div>
 
-      {/* Modal for viewing photo */}
-      {openPhoto && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-          onClick={() => setOpenPhoto(null)}
-        >
+      {/* Fullscreen Viewer */}
+      {currentImageIndex !== null && (
+        <div className="fullscreen-viewer" onClick={closeImageViewer}>
           <div
-            className="relative max-w-4xl w-full mx-4"
-            onClick={(e) => e.stopPropagation()}
+            className="viewer-content"
+            onClick={(e) => e.stopPropagation()} // Prevent closing on inner clicks
           >
             <img
-              src={openPhoto.src}
-              alt="Expanded View"
-              className="w-auto h-[80vh] rounded-md"
+              src={photos[currentImageIndex].src}
+              alt={photos[currentImageIndex].repo_name}
+              className="fullscreen-image"
             />
-            <button
-              className="absolute top-4 left-4 "
-              onClick={() => setOpenPhoto(null)}
-            >
-              <i className="fa-solid fa-circle-xmark text-xl text-gray-200"></i>
+            <button className="prev-button" onClick={showPreviousImage}>
+              &#9664; {/* Left Arrow */}
+            </button>
+            <button className="next-button" onClick={showNextImage}>
+              &#9654; {/* Right Arrow */}
+            </button>
+            <button className="close-button" onClick={closeImageViewer}>
+              &#10005; {/* Close X */}
             </button>
           </div>
         </div>
+      )}
+
+      {/* Custom Context Menu */}
+      {contextMenu && (
+        <ul
+          className="context-menu text-left"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+        >
+          <li onClick={() => handleMenuOptionClick("View Fullscreen")}>
+            View Fullscreen
+          </li>
+          <li onClick={() => handleMenuOptionClick("Download")}>Download</li>
+          <li onClick={() => handleMenuOptionClick("Get Info")}>Get Info</li>
+          <li onClick={() => handleMenuOptionClick("Rename")}>Rename</li>
+          <li
+            className="text-red-500"
+            onClick={() => handleMenuOptionClick("Delete")}
+          >
+            Delete
+          </li>
+        </ul>
       )}
     </div>
   );

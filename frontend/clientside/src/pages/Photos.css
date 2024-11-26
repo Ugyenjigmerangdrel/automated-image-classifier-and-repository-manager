@@ -1,78 +1,140 @@
-.photo-container {
-  padding: 20px;
+/* General Styling */
+.App {
+  font-family: Arial, sans-serif;
   text-align: center;
+  padding: 20px;
 }
 
-.photo-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr); /* Set exactly 5 photos per row */
-  gap: 0; /* Remove space between photos for a seamless look */
+.my-masonry-grid {
+  display: flex;
+  margin-left: -15px; /* Offset for padding */
+  width: auto;
 }
 
-.photo-thumbnail-container {
-  position: relative; /* Use relative positioning for the container */
+.my-masonry-grid_column {
+  padding-left: 15px; /* Padding for columns */
 }
 
-.photo-thumbnail {
-  width: 100%;
-  aspect-ratio: 1 / 1; /* Make each image a perfect square */
-  object-fit: cover; /* Ensure images cover the entire square without distortion */
+.image-container {
+  margin-bottom: 15px;
+  position: relative;
+  overflow: hidden;
+  /* border-radius: 10px; */
   cursor: pointer;
-  border: none; /* Remove any border to create a seamless look */
 }
 
-.photo-badge {
-  position: absolute; /* Position it absolutely relative to its container */
-  top: 500px; /* Adjust the position as needed */
-  left: 500px; /* Adjust the position as needed */
-  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
-  color: #fff; /* White text */
-  padding: 5px 10px; /* Padding to make it look like a badge */
-  border-radius: 5px; /* Slightly rounded corners for the badge */
-  font-size: 14px; /* Font size for badge text */
+.image-item {
+  width: 100%;
+  height: auto;
+  /* border-radius: 10px; */
+  transition: transform 0.3s ease;
 }
 
-.photo-modal {
+.image-item:hover {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+/* Fullscreen Viewer */
+.fullscreen-viewer {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
-.photo-modal-content {
+.viewer-content {
   position: relative;
-  max-width: 80%;
-  max-height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.photo-full {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
+.fullscreen-image {
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: 10px;
 }
 
+/* Navigation Buttons */
+.prev-button,
+.next-button,
 .close-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #fff;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
   border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.prev-button:hover,
+.next-button:hover,
+.close-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+/* Position Arrows */
+.prev-button {
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.next-button {
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Position Close Button */
+.close-button {
+  top: 5%;
+  right: 5%;
+}
+
+/* Context Menu Styling */
+.context-menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
   border-radius: 5px;
+  list-style: none;
+  padding: 10px;
+  z-index: 2000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.context-menu li {
   padding: 5px 10px;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.close-button:hover {
-  background-color: #ddd;
-}
-
-.error-message {
-  color: red;
-  font-weight: bold;
+.context-menu li:hover {
+  background: #f0f0f0;
 }
