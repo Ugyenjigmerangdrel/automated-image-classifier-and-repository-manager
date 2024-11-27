@@ -5,12 +5,13 @@ import Album from './components/pages/Album.tsx';
 import AlbumPhoto from './components/pages/AlbumPhotos.tsx';
 import Upload from './components/pages/Upload.tsx';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Sidebar from './components/dashboard/Sidebar.tsx';
 import PrivateRoute from './PrivateRoute.tsx';
 import LoginSignup from './components/pages/LoginSignup.tsx';
+import SideBar from './components/dashboard/Sidebar.tsx';
 
 function App() {
   const { userToken } = useAuth();
+  console.log(userToken)
   return (
     <>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme"><Router>
@@ -21,7 +22,7 @@ function App() {
               userToken ? <Navigate to="/photos" /> : <LoginSignup />
             }
           />
-          <Route element={<Sidebar />}>
+          <Route element={ <SideBar /> }>
             <Route element={<PrivateRoute />}>
               <Route path="/photos">
                 <Route index={true} element={<Gallery />} />

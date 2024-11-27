@@ -14,6 +14,8 @@ import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 import time
 import hashlib
+import random
+import string
 
 main = Blueprint("main", __name__)
 
@@ -158,3 +160,75 @@ def fetchAllImages():
     image_list = [img.to_json() for img in images]
 
     return jsonify({"image_list":list_img}), 200
+
+@main.route('/images/update_repo', methods=['PUT'])
+@jwt_required()
+def updateImageClass():
+    data = request.get_json()
+    image_id = data.get('image_id')
+    new_repo = data.get('new_repo_id')
+    image = Images.query.filter_by(image_id=int(image_id)).first()
+    image.repo_id = new_repo
+    db.session.commit()
+
+    return jsonify({"msg":"Succesfully Received!"}), 200
+
+@main.route('/images/repo/delete/<string:repoId>', methods=['DELETE'])
+@jwt_required()
+def deleteRepo(repoId):
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+
+    #checking if the repo actually belongs to the user
+    repo = Repository.query.filter_by(repo_id=repoId).first()
+
+    if repo.owner_id != user.id:
+        return jsonify({"msg":"There is not such repository with this repository id!"}), 400
+    
+    delete_images = Images.query.filter_by(repo_id=repo.repo_id).delete()
+    Repository.query.filter_by(repo_id=repo.repo_id).delete()
+    db.session.commit()
+
+    return jsonify({"msg":"Deleted the repository successfully!"}),200
+
+
+@main.route('/images/delete/<string:imageId>', methods=['DELETE'])
+@jwt_required()
+def deleteImage(imageId):
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+
+    #checking if the repo actually belongs to the user
+    image = Images.query.filter_by(image_id=imageId).first()
+
+    if image.owner_id != user.id:
+        return jsonify({"msg":"There is not such image with this image id!"}), 400
+    
+    delete_images = Images.query.filter_by(image_id=imageId).delete()
+    db.session.commit()
+
+    return jsonify({"msg":"Deleted the image successfully!"}),200
+
+# Utils
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+@main.route('/images/repo/add_repo', methods=['POST'])
+@jwt_required()
+def addRepo():
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+    data = request.get_json()
+    repo_name = data.get('repo_name')
+
+    if(repo_name == ''):
+        return jsonify({'msg':'Class name is Required'}), 400
+
+    rand_id = id_generator()
+
+    new_repo = Repository(repo_id=f'{user.id}-{rand_id}', repo_name=repo_name, owner_id=user.id)
+    db.session.add(new_repo)
+    db.session.commit()
+
+    return jsonify({'msg':'Added New Album Succesfully'}), 200
+

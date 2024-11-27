@@ -17,8 +17,10 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           </Label>
           <SidebarInput
             id="search"
-            placeholder="Search the gallery..."
+            placeholder="Search for images..."
             className="pl-8"
+
+            name="search"
           />
           <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 select-none opacity-50" />
         </SidebarGroupContent>

@@ -10,6 +10,7 @@ const PrivateRoute: React.FC = () => {
     if (userToken && isTokenExpired(userToken)) {
       logout();
     }
+    
   }, [userToken, logout]);
 
   if (!userToken) return <Navigate to="/" />;
