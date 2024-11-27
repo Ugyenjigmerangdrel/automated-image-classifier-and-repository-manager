@@ -16,8 +16,18 @@ import { SearchForm } from "../search-form"
 import { Outlet } from "react-router-dom"
 import ModeToggle from "./ModeToggle"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { LogOut } from "lucide-react"
+import { Button } from "../ui/button"
+import { useAuth } from "@/context/AuthContext"
 
 export default function SideBar() {
+  const {logout} = useAuth();
+  const handleSearch = (e:React.FormEvent) => {
+    e.preventDefault()
+    const fd = new FormData(e.target);
+    const fe = Object.fromEntries(fd.entries())
+    console.log(fe)
+  }
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -32,16 +42,13 @@ export default function SideBar() {
                 <BreadcrumbItem className="hidden md:block"></BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            <SearchForm className="lg:w-[40vw] md:w-[50vw]" />
+            <SearchForm className="lg:w-[40vw] md:w-[50vw]" onSubmit={handleSearch}/>
           </div>
 
           {/* Right side: ModeToggle */}
           <div className="flex gap-2 items-center ml-auto">
             <ModeToggle />
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+            <Button variant="destructive" onClick={logout}><LogOut /></Button>
 
           </div>
         </header>

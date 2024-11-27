@@ -45,7 +45,7 @@ export default function LoginSignup() {
                   id="email"
                   type="email"
                   name="email"
-                  placeholder="m@example.com"
+                  placeholder="example@gmail.com"
                   required
                 />
               </div>
